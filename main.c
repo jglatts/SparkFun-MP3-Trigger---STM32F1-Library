@@ -1,4 +1,5 @@
 #include "main.h"
+#include "mp3_trigger.h"
 
 I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
