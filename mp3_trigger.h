@@ -14,17 +14,18 @@
 typedef enum {
 	MP3_ERROR,
 	MP3_OK
-} MP3_STATE;
+} MP3_State;
 
 #define NO_DELAY 0
 #define STD_DELAY 5
 
 uint8_t trig_status_buff[30];
 
-MP3_STATE MP3_UART_Init(UART_HandleTypeDef*);
-void MP3_Get_Trigger_Status(UART_HandleTypeDef *huart1);
-void MP3_Wait_For_Song_Finish(UART_HandleTypeDef *huart1);
-void MP3_Run_Trig_Cmd(UART_HandleTypeDef *huart1, uint8_t, uint8_t, uint16_t);
-void MP3_Play_Song(UART_HandleTypeDef *huart1, uint8_t num);
+MP3_State MP3_UART_Init(UART_HandleTypeDef*);
+MP3_State MP3_Get_Trigger_Status(UART_HandleTypeDef*);
+MP3_State MP3_Wait_For_Song_Finish(UART_HandleTypeDef*);
+void MP3_Run_Trig_Cmd(UART_HandleTypeDef*, uint8_t, uint8_t, uint16_t);
+void MP3_Play_Song(UART_HandleTypeDef*, uint8_t);
+void MP3_Play_All_Songs(UART_HandleTypeDef*, uint8_t);
 
 #endif /* INC_MP3_TRIGGER_H_ */
