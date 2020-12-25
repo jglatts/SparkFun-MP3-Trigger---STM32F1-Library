@@ -9,7 +9,7 @@
 #include "stm32f1xx_hal.h"
 #include "mp3_trigger.h"
 
-MP3_STATE MP3_UART_Init(UART_HandleTypeDef* huart1) {
+MP3_State MP3_UART_Init(UART_HandleTypeDef* huart1) {
 	  huart1->Instance = USART1;
 	  huart1->Init.BaudRate = 38400;
 	  huart1->Init.WordLength = UART_WORDLENGTH_8B;
@@ -19,6 +19,25 @@ MP3_STATE MP3_UART_Init(UART_HandleTypeDef* huart1) {
 	  huart1->Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	  huart1->Init.OverSampling = UART_OVERSAMPLING_16;
 	  return (HAL_UART_Init(huart1) == HAL_OK) ? MP3_OK : MP3_ERROR;
+}
+
+MP3_State MP3_Get_Trigger_Status(UART_HandleTypeDef* const huart1)
+{
+	MP3_Run_Trig_Cmd(huart1, 'S', '1', NO_DELAY);
+	HAL_UART_Receive(huart1, trig_status_buff, sizeof(trig_status_buff), 50);
+	if (trig_status_buff == NULL || *trig_status_buff == '\0') return MP3_ERROR;
+	return MP3_OK;
+}
+
+MP3_State MP3_Wait_For_Song_Finish(UART_HandleTypeDef* const huart1)
+{
+	uint8_t trig_msg = 0;
+	while (trig_msg == 0)
+	{
+		HAL_UART_Receive(huart1, &trig_msg, sizeof(trig_msg), 50);
+	}
+	if (trig_msg != 'X') return MP3_ERROR;
+	return MP3_OK;
 }
 
 void MP3_Run_Trig_Cmd(UART_HandleTypeDef* const huart1, uint8_t cmd, uint8_t num, uint16_t delay)
@@ -33,17 +52,11 @@ void MP3_Play_Song(UART_HandleTypeDef* const huart1, uint8_t song_num)
 	MP3_Run_Trig_Cmd(huart1, 'p', song_num, 300);
 }
 
-void MP3_Get_Trigger_Status(UART_HandleTypeDef* const huart1)
-{
-	MP3_Run_Trig_Cmd(huart1, 'S', '1', NO_DELAY);
-	HAL_UART_Receive(huart1, trig_status_buff, sizeof(trig_status_buff), 50);
-}
-
-void MP3_Wait_For_Song_Finish(UART_HandleTypeDef* const huart1)
-{
-	uint8_t trig_msg = 0;
-	while (trig_msg == 0)
-	{
-		HAL_UART_Receive(huart1, &trig_msg, sizeof(trig_msg), 50);
+void MP3_Play_All_Songs(UART_HandleTypeDef* huart1, uint8_t num_songs) {
+	uint8_t current = 1;
+	while (current <= num_songs) {
+		MP3_Play_Song(huart1, current);
+		if (MP3_Wait_For_Song_Finish(huart1) == MP3_OK) current++;
+		else return;
 	}
 }
