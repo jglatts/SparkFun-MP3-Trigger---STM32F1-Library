@@ -9,7 +9,8 @@
 #include "stm32f1xx_hal.h"
 #include "mp3_trigger.h"
 
-MP3_State MP3_UART_Init(UART_HandleTypeDef* huart1) {
+MP3_State MP3_UART_Init(UART_HandleTypeDef* huart1) 
+{
 	  huart1->Instance = USART1;
 	  huart1->Init.BaudRate = 38400;
 	  huart1->Init.WordLength = UART_WORDLENGTH_8B;
@@ -52,7 +53,8 @@ void MP3_Play_Song(UART_HandleTypeDef* const huart1, uint8_t song_num)
 	MP3_Run_Trig_Cmd(huart1, 'p', song_num, 300);
 }
 
-void MP3_Play_All_Songs(UART_HandleTypeDef* huart1, uint8_t num_songs) {
+void MP3_Play_All_Songs(UART_HandleTypeDef* huart1, uint8_t num_songs) 
+{
 	uint8_t current = 1;
 	while (current <= num_songs) {
 		MP3_Play_Song(huart1, current);
