@@ -1,4 +1,4 @@
-# STM32F1 Library for the SparkFun MP3 Trigger 
+# SparkFun MP3 Trigger library for STM32 
 
 
 Documentation is on the way!
